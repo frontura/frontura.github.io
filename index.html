@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.81d</title>
+    <title>Summer Cottage Booking - v0.81e</title>
     <style>
         * {
             margin: 0;
@@ -530,7 +530,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v0.81d)</h2>
+            <h2>Frontura Early Access Booking (v0.81e)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -942,6 +942,8 @@
             // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
                 const dayNumber = document.createElement('div');
                 dayNumber.className = 'day-number';
                 dayNumber.textContent = day;
