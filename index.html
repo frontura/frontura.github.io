@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.81b</title>
+    <title>Summer Cottage Booking - v0.81c</title>
     <style>
         * {
             margin: 0;
@@ -530,7 +530,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v0.81b)</h2>
+            <h2>Frontura Early Access Booking (v0.81c)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -1141,46 +1141,42 @@
             return false;
         }
 
-        // JSONP workaround for POST requests
         async function submitBookingViaJSONP(formData) {
-            return new Promise((resolve, reject) => {
-                // Create a unique callback name
-                const callbackName = 'bookingCallback_' + Date.now();
-                
-                // Create the callback function
-                window[callbackName] = function(response) {
-                    // Clean up
+        return new Promise((resolve, reject) => {
+            const callbackName = 'bookingCallback_' + Date.now();
+
+            // Prepare callback for JSONP
+            window[callbackName] = function(response) {
+                document.body.removeChild(script);
+                delete window[callbackName];
+                resolve(response);
+            };
+
+            // Build query params from formData
+            const params = new URLSearchParams(formData);
+            params.append('callback', callbackName);
+
+            // Create script tag for JSONP
+            const script = document.createElement('script');
+            script.src = `${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`;
+            script.onerror = function() {
+                document.body.removeChild(script);
+                delete window[callbackName];
+                reject(new Error('JSONP request failed'));
+            };
+
+            document.body.appendChild(script);
+
+            // Timeout after 10 seconds
+            setTimeout(() => {
+                if (window[callbackName]) {
                     document.body.removeChild(script);
                     delete window[callbackName];
-                    
-                    resolve(response);
-                };
-                
-                // Use JSONP approach to avoid CORS issues
-                const result = await submitBookingViaJSONP(formData);
-                
-                // Create script tag for JSONP
-                const script = document.createElement('script');
-                script.src = `${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`;
-                script.onerror = function() {
-                    document.body.removeChild(script);
-                    delete window[callbackName];
-                    reject(new Error('JSONP request failed'));
-                };
-                
-                // Add script to page
-                document.body.appendChild(script);
-                
-                // Timeout after 10 seconds
-                setTimeout(() => {
-                    if (window[callbackName]) {
-                        document.body.removeChild(script);
-                        delete window[callbackName];
-                        reject(new Error('Request timeout'));
-                    }
-                }, 10000);
-            });
-        }
+                    reject(new Error('Request timeout'));
+                }
+            }, 10000);
+        });
+}
 
         // Start the app when page loads
         window.addEventListener('load', () => {
