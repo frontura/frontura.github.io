@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.68</title>
+    <title>Summer Cottage Booking - v0.71</title>
     <style>
         * {
             margin: 0;
@@ -531,7 +531,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v.2.3)</h2>
+            <h2>Frontura Early Access Booking (v0.71)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -575,7 +575,7 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color host-available"></div>
-                    <span>Host Available on-site (join welcome!)</span>
+                    <span>Host Available (join welcome)</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color booked"></div>
@@ -662,22 +662,13 @@
         // Initialize the app
         function initializeApp() {
             console.log('=== INITIALIZING APP ===');
-            console.log('Modal element:', document.getElementById('booking-modal'));
-            console.log('Modal classes:', document.getElementById('booking-modal')?.classList);
-            console.log('Auth section:', document.getElementById('auth-section'));
-            console.log('Auth section classes:', document.getElementById('auth-section')?.classList);
-            
-            // Ensure modal is hidden on startup
-            const modal = document.getElementById('booking-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-                console.log('Modal hidden class added');
-            }
+            console.log('Google API loaded?', typeof google !== 'undefined');
             
             if (typeof google !== 'undefined') {
+                console.log('Google API available, initializing auth...');
                 initializeGoogleAuth();
             } else {
-                // Retry if Google API not loaded yet
+                console.log('Google API not loaded yet, retrying in 100ms...');
                 setTimeout(initializeApp, 100);
             }
         }
@@ -688,10 +679,20 @@
             
             // Test OAuth config first
             if (!testOAuthConfig()) {
+                console.error('OAuth config test failed, stopping initialization');
                 return; // Stop if config is invalid
             }
             
             try {
+                console.log('Creating OAuth client...');
+                
+                // Check if google.accounts.oauth2 exists
+                if (!google.accounts || !google.accounts.oauth2) {
+                    console.error('Google OAuth2 API not available');
+                    alert('Google authentication not available. Please refresh the page.');
+                    return;
+                }
+                
                 // Use OAuth2 popup method instead of Identity Services
                 window.gsiClient = google.accounts.oauth2.initTokenClient({
                     client_id: CONFIG.GOOGLE_CLIENT_ID,
@@ -703,7 +704,7 @@
                     }
                 });
 
-                console.log('OAuth client initialized successfully');
+                console.log('OAuth client created successfully');
 
                 // Show login button
                 const loadingElement = document.querySelector('.loading');
@@ -717,25 +718,33 @@
                 if (loginBtn) {
                     loginBtn.classList.remove('hidden');
                     console.log('Login button shown');
+                } else {
+                    console.error('Login button not found!');
                 }
 
                 // Add event listener for login button
-                document.getElementById('login-btn').addEventListener('click', () => {
-                    console.log('Login button clicked - requesting access token');
-                    console.log('Using client ID:', CONFIG.GOOGLE_CLIENT_ID);
-                    try {
-                        window.gsiClient.requestAccessToken({
-                            prompt: 'consent'
-                        });
-                    } catch (error) {
-                        console.error('Error requesting access token:', error);
-                        alert('Login failed. Please try again.');
-                    }
-                });
+                const loginButton = document.getElementById('login-btn');
+                if (loginButton) {
+                    loginButton.addEventListener('click', () => {
+                        console.log('Login button clicked - requesting access token');
+                        console.log('Using client ID:', CONFIG.GOOGLE_CLIENT_ID);
+                        try {
+                            window.gsiClient.requestAccessToken({
+                                prompt: 'consent'
+                            });
+                        } catch (error) {
+                            console.error('Error requesting access token:', error);
+                            alert('Login failed. Please try again.');
+                        }
+                    });
+                    console.log('Login button event listener added');
+                } else {
+                    console.error('Could not find login button to add event listener');
+                }
                 
             } catch (error) {
                 console.error('Error initializing Google OAuth:', error);
-                alert('Failed to initialize authentication. Check your client ID.');
+                alert('Failed to initialize authentication. Check console for details.');
             }
         }
 
