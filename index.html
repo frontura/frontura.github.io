@@ -1142,7 +1142,7 @@
         }
 
         // JSONP workaround for POST requests
-        function submitBookingViaJSONP(formData) {
+        async function submitBookingViaJSONP(formData) {
             return new Promise((resolve, reject) => {
                 // Create a unique callback name
                 const callbackName = 'bookingCallback_' + Date.now();
