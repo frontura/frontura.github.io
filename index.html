@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.71</title>
+    <title>Summer Cottage Booking - v0.81a</title>
     <style>
         * {
             margin: 0;
@@ -525,13 +525,12 @@
                 padding: 6px 12px;
                 font-size: 0.8em;
             }
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v0.71)</h2>
+            <h2>Frontura Early Access Booking (v0.81a)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -624,6 +623,9 @@
         </div>
     </div>
 
+    <!-- Google Sign-In Script -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <!-- Google Sign-In Script -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
@@ -866,10 +868,10 @@
             } catch (error) {
                 console.error('Failed to load bookings:', error);
                 console.log('Using demo data instead');
-                
-                // Demo data for offline testing
-                bookings = [
-                    
+            }
+        }
+        
+
         // Find booking for a specific date - now returns array for host-available dates
         function findBookingForDate(date) {
             const bookingsOnDate = bookings.filter(booking => {
@@ -886,14 +888,7 @@
             const hostAvailable = bookingsOnDate.find(b => b.bookingType === 'host-available');
             return hostAvailable || bookingsOnDate[0];
         }
-                ];
                 
-                // Show user that we're using demo data
-                if (error.message.includes('CORS') || error.message.includes('fetch')) {
-                    console.log('CORS error detected - Apps Script needs redeployment');
-                }
-            }
-        }
 
         // Render calendar
         function renderCalendar() {
