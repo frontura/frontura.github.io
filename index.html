@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.42</title>
+    <title>Summer Cottage Booking - v0.68</title>
     <style>
         * {
             margin: 0;
@@ -106,9 +106,48 @@
             transition: all 0.3s ease;
         }
 
-        .calendar-nav:hover {
-            background: #5a67d8;
-            transform: scale(1.05);
+        .calendar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 2px solid;
+            flex-shrink: 0;
+        }
+
+        .legend-color.today {
+            background: linear-gradient(135deg, #fed7aa, #fdba74);
+            border-color: #f97316;
+        }
+
+        .legend-color.available {
+            background: white;
+            border-color: #e2e8f0;
+        }
+
+        .legend-color.host-available {
+            background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+            border-color: #8b5cf6;
+        }
+
+        .legend-color.booked {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            border-color: #38a169;
         }
 
         .calendar-title {
@@ -144,21 +183,49 @@
             position: relative;
         }
 
+        .calendar-day.booked {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border-color: #38a169;
+        }
+
         .calendar-day:hover {
             border-color: #667eea;
             background: #f7fafc;
             transform: scale(1.02);
         }
 
+        .calendar-day.today {
+            background: linear-gradient(135deg, #fed7aa, #fdba74);
+            border-color: #f97316;
+            font-weight: 600;
+        }
+
+        .calendar-day.today:hover {
+            background: linear-gradient(135deg, #fdba74, #fb923c);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        }
+
+        .calendar-day.host-available {
+            background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+            border-color: #8b5cf6;
+            color: #4c1d95;
+        }
+
+        .calendar-day.host-available:hover {
+            background: linear-gradient(135deg, #c4b5fd, #a78bfa);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .calendar-day.host-available .day-number {
+            font-weight: 600;
+        }
+
         .calendar-day.other-month {
             background: #f8f9fa;
             color: #adb5bd;
-        }
-
-        .calendar-day.booked {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            border-color: #38a169;
         }
 
         .calendar-day.booked:hover {
@@ -169,11 +236,6 @@
         .day-number {
             font-weight: 600;
             margin-bottom: 5px;
-        }
-
-        .booking-info {
-            font-size: 0.8em;
-            opacity: 0.9;
         }
 
         .booking-form {
@@ -196,19 +258,19 @@
             color: #4a5568;
         }
 
-        .form-group input, .form-group textarea {
+                        <div class="form-group">
+                            <label for="notes">Notes (optional):</label>
+                            <textarea id="notes" rows="3" placeholder="Any special requests or notes..."></textarea>
+                        </div>
+
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e2e8f0;
             border-radius: 10px;
             font-size: 1em;
             transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
         }
 
         .form-buttons {
@@ -359,11 +421,10 @@
                 margin-bottom: 20px;
             }
             
-            .calendar-header {
-                flex-direction: column;
-                gap: 15px;
-                margin-bottom: 20px;
-            }
+        .calendar-nav:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+        }
             
             .calendar-title {
                 font-size: 1.4em;
@@ -427,9 +488,24 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .header h2 {
-                font-size: 1.8em;
+            .calendar-header {
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .calendar-legend {
+                gap: 15px;
+                font-size: 0.8em;
+            }
+            
+            .legend-item {
+                gap: 6px;
+            }
+            
+            .legend-color {
+                width: 14px;
+                height: 14px;
             }
             
             .calendar-day {
@@ -455,7 +531,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v.0.42)</h2>
+            <h2>Frontura Early Access Booking (v.2.3)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -487,6 +563,26 @@
                 <button id="next-month" class="calendar-nav">Next →</button>
             </div>
             
+            <!-- Calendar Legend -->
+            <div class="calendar-legend">
+                <div class="legend-item">
+                    <div class="legend-color today"></div>
+                    <span>Today</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color available"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color host-available"></div>
+                    <span>Host Available on-site (join welcome!)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color booked"></div>
+                    <span>Fully Booked</span>
+                </div>
+            </div>
+            
             <div class="calendar-grid" id="calendar-grid"></div>
         </div>
 
@@ -504,13 +600,19 @@
                             <label for="end-date">End Date:</label>
                             <input type="date" id="end-date" required>
                         </div>
+        .calendar-day.today .day-number {
+            color: #9a3412;
+        }
                         <div class="form-group">
                             <label for="guest-name">Your Name:</label>
                             <input type="text" id="guest-name" required>
                         </div>
                         <div class="form-group">
-                            <label for="notes">Notes (optional):</label>
-                            <textarea id="notes" rows="3" placeholder="Any special requests or notes..."></textarea>
+                            <label for="booking-type">Booking Type:</label>
+                            <select id="booking-type" required>
+                                <option value="exclusive">Exclusive Booking (just me/my group)</option>
+                                <option value="host-available">Host Available (others can join)</option>
+                            </select>
                         </div>
                         <div class="form-buttons">
                             <button type="submit" class="btn btn-primary">Book Now</button>
@@ -529,7 +631,7 @@
         // Configuration - Replace with your actual values
         const CONFIG = {
             GOOGLE_CLIENT_ID: '132010592048-ihv1dt7r0kkkoojtsf4g03uh9vtpdhn0.apps.googleusercontent.com',
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwCOlIEafuybVSOUANzaMEm-Va4saFhIQHbH6TDGRWQzYRwmGw_ORmMCF20c_e1w--61w/exec'
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzHy2JREf68se09SpTVelNGdKxJCLUg515N2Z9mqV7FX78AkzE_mrA_lDtqo5t5iL-jrg/exec'
         };
 
         // Debug function to test OAuth config
@@ -759,21 +861,22 @@
                 // Demo data for offline testing
                 bookings = [
                     {
-                        id: 1,
-                        startDate: '2025-07-15',
-                        endDate: '2025-07-18',
-                        guestName: 'John Doe',
-                        guestEmail: 'john@example.com',
-                        notes: 'Birthday celebration'
-                    },
-                    {
-                        id: 2,
-                        startDate: '2025-07-25',
-                        endDate: '2025-07-28',
-                        guestName: 'Jane Smith',
-                        guestEmail: 'jane@example.com',
-                        notes: 'Family weekend'
-                    }
+        // Find booking for a specific date - now returns array for host-available dates
+        function findBookingForDate(date) {
+            const bookingsOnDate = bookings.filter(booking => {
+                const start = new Date(booking.startDate);
+                const end = new Date(booking.endDate);
+                const checkDate = new Date(date);
+                return checkDate >= start && checkDate <= end;
+            });
+            
+            // Return the primary booking (first one, or host-available if exists)
+            if (bookingsOnDate.length === 0) return null;
+            
+            // Prioritize host-available bookings for display
+            const hostAvailable = bookingsOnDate.find(b => b.bookingType === 'host-available');
+            return hostAvailable || bookingsOnDate[0];
+        }
                 ];
                 
                 // Show user that we're using demo data
@@ -834,8 +937,10 @@
 
             // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
+        .booking-info {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
                 
                 const dayNumber = document.createElement('div');
                 dayNumber.className = 'day-number';
@@ -846,13 +951,11 @@
                 const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const booking = findBookingForDate(dateString);
                 
-                if (booking) {
-                    dayElement.classList.add('booked');
-                    const bookingInfo = document.createElement('div');
-                    bookingInfo.className = 'booking-info';
-                    bookingInfo.textContent = booking.guestName;
-                    dayElement.appendChild(bookingInfo);
-                }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
 
                 // Add click handler
                 dayElement.addEventListener('click', () => {
@@ -868,15 +971,17 @@
             }
         }
 
-        // Find booking for a specific date
-        function findBookingForDate(date) {
-            return bookings.find(booking => {
-                const start = new Date(booking.startDate);
-                const end = new Date(booking.endDate);
-                const checkDate = new Date(date);
-                return checkDate >= start && checkDate <= end;
-            });
-        }
+                // Prepare the data as URL parameters
+                const params = new URLSearchParams({
+                    action: 'addBooking',
+                    startDate: formData.startDate,
+                    endDate: formData.endDate,
+                    guestName: formData.guestName,
+                    guestEmail: formData.guestEmail,
+                    notes: formData.notes,
+                    bookingType: formData.bookingType,
+                    callback: callbackName
+                });
 
         // Open booking modal
         function openBookingModal(date, existingBooking = null) {
@@ -895,32 +1000,26 @@
             const notesInput = document.getElementById('notes');
             const modalTitle = document.getElementById('modal-title');
 
-            if (existingBooking) {
-                modalTitle.textContent = 'View Booking';
-                startDateInput.value = existingBooking.startDate;
-                endDateInput.value = existingBooking.endDate;
-                guestNameInput.value = existingBooking.guestName;
-                notesInput.value = existingBooking.notes || '';
-                
-                // Make read-only if not current user's booking
-                const isOwnBooking = existingBooking.guestEmail === currentUser.email;
-                startDateInput.disabled = !isOwnBooking;
-                endDateInput.disabled = !isOwnBooking;
-                guestNameInput.disabled = !isOwnBooking;
-                notesInput.disabled = !isOwnBooking;
-            } else {
-                modalTitle.textContent = 'Book Your Stay';
-                startDateInput.value = date;
-                endDateInput.value = date;
-                guestNameInput.value = currentUser.name;
-                notesInput.value = '';
-                
-                // Enable all fields
-                startDateInput.disabled = false;
-                endDateInput.disabled = false;
-                guestNameInput.disabled = false;
-                notesInput.disabled = false;
-            }
+                if (booking) {
+                    // Add appropriate class based on booking type
+                    if (booking.bookingType === 'host-available') {
+                        dayElement.classList.add('host-available');
+                    } else {
+                        dayElement.classList.add('booked');
+                    }
+                    
+                    const bookingInfo = document.createElement('div');
+                    bookingInfo.className = 'booking-info';
+                    
+                    // Show different text based on booking type
+                    if (booking.bookingType === 'host-available') {
+                        bookingInfo.textContent = `${booking.guestName} + others welcome`;
+                    } else {
+                        bookingInfo.textContent = booking.guestName;
+                    }
+                    
+                    dayElement.appendChild(bookingInfo);
+                }
 
             modal.classList.remove('hidden');
         }
@@ -1021,8 +1120,14 @@
             try {
                 console.log('Sending request via JSONP workaround...');
                 
-                // Use JSONP approach to avoid CORS issues
-                const result = await submitBookingViaJSONP(formData);
+                const formData = {
+                    startDate: document.getElementById('start-date').value,
+                    endDate: document.getElementById('end-date').value,
+                    guestName: document.getElementById('guest-name').value,
+                    guestEmail: currentUser.email,
+                    notes: document.getElementById('notes').value,
+                    bookingType: document.getElementById('booking-type').value
+                };
                 console.log('Response data:', result);
                 
                 if (result.success) {
@@ -1056,16 +1161,8 @@
                     resolve(response);
                 };
                 
-                // Prepare the data as URL parameters
-                const params = new URLSearchParams({
-                    action: 'addBooking',
-                    startDate: formData.startDate,
-                    endDate: formData.endDate,
-                    guestName: formData.guestName,
-                    guestEmail: formData.guestEmail,
-                    notes: formData.notes,
-                    callback: callbackName
-                });
+                // Use JSONP approach to avoid CORS issues
+                const result = await submitBookingViaJSONP(formData);
                 
                 // Create script tag for JSONP
                 const script = document.createElement('script');
