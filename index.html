@@ -941,10 +941,6 @@
 
             // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
-        .booking-info {
-            font-size: 0.8em;
-            opacity: 0.9;
-        }
                 
                 const dayNumber = document.createElement('div');
                 dayNumber.className = 'day-number';
@@ -955,11 +951,6 @@
                 const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const booking = findBookingForDate(dateString);
                 
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
 
                 // Add click handler
                 dayElement.addEventListener('click', () => {
