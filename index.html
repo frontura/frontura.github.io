@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.82</title>
+    <title>Summer Cottage Booking - v0.83</title>
     <style>
         * {
             margin: 0;
@@ -205,6 +205,15 @@
             background: linear-gradient(135deg, #fdba74, #fb923c);
             transform: scale(1.05);
             box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        }
+
+        .calendar-day.today .day-number {
+            color: #9a3412;
+        }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 5px;
         }
 
         .calendar-day.host-available {
@@ -530,7 +539,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v0.82)</h2>
+            <h2>Frontura Early Access Booking (v0.83)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -599,9 +608,7 @@
                             <label for="end-date">End Date:</label>
                             <input type="date" id="end-date" required>
                         </div>
-        .calendar-day.today .day-number {
-            color: #9a3412;
-        }
+
                         <div class="form-group">
                             <label for="guest-name">Your Name:</label>
                             <input type="text" id="guest-name" required>
@@ -988,7 +995,6 @@
             }
         }
 
-
         // Open booking modal
         function openBookingModal(date, existingBooking = null) {
             // Don't open modal if user isn't logged in
@@ -1006,7 +1012,12 @@
             const notesInput = document.getElementById('notes');
             const modalTitle = document.getElementById('modal-title');
 
-            
+            startDateInput.value = date; // Pre-populate with the clicked date
+            endDateInput.value = date;   // Also default the end date to the same day
+
+            // Pre-fill user's name
+            guestNameInput.value = currentUser.name;
+
             modal.classList.remove('hidden');
         }
 
