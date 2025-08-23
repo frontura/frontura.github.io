@@ -860,7 +860,7 @@
                 }
                 
                 const responseText = await response.text();
-                console.log('Raw response:', responseText);
+                //console.log('Raw response:', responseText);
                 
                 bookings = JSON.parse(responseText);
                 console.log('Bookings loaded:', bookings);
@@ -953,6 +953,26 @@
                 const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const booking = findBookingForDate(dateString);
                 
+                if (booking) {
+                    // Add appropriate class based on booking type
+                    if (booking.bookingType === 'host-available') {
+                        dayElement.classList.add('host-available');
+                    } else {
+                        dayElement.classList.add('booked');
+                    }
+                    
+                    const bookingInfo = document.createElement('div');
+                    bookingInfo.className = 'booking-info';
+                    
+                    // Show different text based on booking type
+                    if (booking.bookingType === 'host-available') {
+                        bookingInfo.textContent = `${booking.guestName} + others welcome`;
+                    } else {
+                        bookingInfo.textContent = booking.guestName;
+                    }
+                    
+                    dayElement.appendChild(bookingInfo);
+                }
 
                 // Add click handler
                 dayElement.addEventListener('click', () => {
@@ -986,27 +1006,7 @@
             const notesInput = document.getElementById('notes');
             const modalTitle = document.getElementById('modal-title');
 
-                if (booking) {
-                    // Add appropriate class based on booking type
-                    if (booking.bookingType === 'host-available') {
-                        dayElement.classList.add('host-available');
-                    } else {
-                        dayElement.classList.add('booked');
-                    }
-                    
-                    const bookingInfo = document.createElement('div');
-                    bookingInfo.className = 'booking-info';
-                    
-                    // Show different text based on booking type
-                    if (booking.bookingType === 'host-available') {
-                        bookingInfo.textContent = `${booking.guestName} + others welcome`;
-                    } else {
-                        bookingInfo.textContent = booking.guestName;
-                    }
-                    
-                    dayElement.appendChild(bookingInfo);
-                }
-
+            
             modal.classList.remove('hidden');
         }
 
