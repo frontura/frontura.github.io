@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.81e</title>
+    <title>Summer Cottage Booking - v0.82</title>
     <style>
         * {
             margin: 0;
@@ -530,7 +530,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v0.81e)</h2>
+            <h2>Frontura Early Access Booking (v0.82)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -1075,58 +1075,68 @@
             });
         }
 
-        // Handle booking form submission with JSONP workaround
+    // Handle booking form submission
         async function handleBookingSubmission(e) {
             e.preventDefault();
             e.stopPropagation();
             
             console.log('Form submission started');
-            
-            const formData = {
+
+            const bookingData = {
+                action: 'addBooking', // This is crucial for the Apps Script doPost function
                 startDate: document.getElementById('start-date').value,
                 endDate: document.getElementById('end-date').value,
                 guestName: document.getElementById('guest-name').value,
                 guestEmail: currentUser.email,
-                notes: document.getElementById('notes').value
+                notes: document.getElementById('notes').value,
+                bookingType: document.getElementById('booking-type').value
             };
 
-            console.log('Form data:', formData);
+            console.log('Submitting booking data:', bookingData);
 
             // Basic validation
-            if (!formData.startDate || !formData.endDate || !formData.guestName) {
-                alert('Please fill in all required fields');
+            if (!bookingData.startDate || !bookingData.endDate || !bookingData.guestName) {
+                alert('Please fill in all required fields.');
                 return false;
             }
 
-            if (new Date(formData.startDate) > new Date(formData.endDate)) {
-                alert('End date must be after start date');
+            if (new Date(bookingData.startDate) > new Date(bookingData.endDate)) {
+                alert('End date must be on or after the start date.');
                 return false;
             }
 
             try {
-                console.log('Sending request via JSONP workaround...');
+                // Show a loading indicator if you have one
+                document.querySelector('#booking-form button[type="submit"]').textContent = 'Booking...';
+
+                const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors', // Important for cross-origin requests
+                    redirect: 'follow',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8', // Apps Script doPost requires this header
+                    },
+                    body: JSON.stringify(bookingData)
+                });
                 
-                const formData = {
-                    startDate: document.getElementById('start-date').value,
-                    endDate: document.getElementById('end-date').value,
-                    guestName: document.getElementById('guest-name').value,
-                    guestEmail: currentUser.email,
-                    notes: document.getElementById('notes').value,
-                    bookingType: document.getElementById('booking-type').value
-                };
+                const result = await response.json();
                 console.log('Response data:', result);
                 
                 if (result.success) {
                     alert('🎉 Booking successful!\n\n📧 Confirmation emails have been sent to you and the cottage owner.');
                     document.getElementById('booking-modal').classList.add('hidden');
-                    await loadBookings();
-                    renderCalendar();
+                    await loadBookings(); // Refresh bookings from the server
+                    renderCalendar();     // Re-draw the calendar with the new booking
                 } else {
-                    alert('Booking failed: ' + result.error);
+                    // Use the specific error message from the script (e.g., date conflict)
+                    alert('Booking failed: ' + (result.error || 'Unknown error.'));
                 }
             } catch (error) {
                 console.error('Booking submission failed:', error);
                 alert('Booking failed. Please try again. Check console for details.');
+            } finally {
+                // Reset button text
+                document.querySelector('#booking-form button[type="submit"]').textContent = 'Book Now';
             }
             
             return false;
