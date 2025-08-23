@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.84</title>
+    <title>Summer Cottage Booking - v0.85</title>
     <style>
         * {
             margin: 0;
@@ -539,7 +539,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v0.84)</h2>
+            <h2>Frontura Early Access Booking (v0.85)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -637,8 +637,6 @@
     <!-- Google Sign-In Script -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
-    <!-- Google Sign-In Script -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <script>
         // Configuration - Replace with your actual values
@@ -1022,8 +1020,64 @@
             modal.classList.remove('hidden');
         }
 
+// Create a flag to ensure event listeners are only attached once
+        let eventListenersAttached = false;
+
         // Setup event listeners
         function setupEventListeners() {
+            // If listeners are already attached, do nothing.
+            if (eventListenersAttached) {
+                return;
+            }
+            
+            console.log('Attaching event listeners for the first time...');
+
+            // Calendar navigation
+            document.getElementById('prev-month').addEventListener('click', () => {
+                const newYear = currentDate.getFullYear();
+                const newMonth = currentDate.getMonth() - 1;
+                currentDate = new Date(newYear, newMonth, 1);
+                renderCalendar();
+            });
+
+            document.getElementById('next-month').addEventListener('click', () => {
+                const newYear = currentDate.getFullYear();
+                const newMonth = currentDate.getMonth() + 1;
+                currentDate = new Date(newYear, newMonth, 1);
+                renderCalendar();
+            });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                currentUser = null;
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('calendar-container').classList.add('hidden');
+                document.getElementById('auth-section').classList.remove('hidden');
+                document.querySelector('.loading').classList.add('hidden');
+                document.getElementById('login-btn').classList.remove('hidden');
+            });
+
+            // Modal close
+            document.getElementById('cancel-booking').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('booking-modal').classList.add('hidden');
+            });
+
+            // Booking form submission
+            document.getElementById('booking-form').addEventListener('submit', handleBookingSubmission);
+
+            // Close modal when clicking outside
+            document.getElementById('booking-modal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('booking-modal')) {
+                    document.getElementById('booking-modal').classList.add('hidden');
+                }
+            });
+
+            // Set the flag to true so this function won't run again
+            eventListenersAttached = true;
+        }
+
             // Calendar navigation with proper month handling
             document.getElementById('prev-month').addEventListener('click', () => {
                 console.log('Previous month clicked. Current date before:', currentDate);
