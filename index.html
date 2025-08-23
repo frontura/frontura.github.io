@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Cottage Booking - v0.83</title>
+    <title>Summer Cottage Booking - v0.84</title>
     <style>
         * {
             margin: 0;
@@ -539,7 +539,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Frontura Early Access Booking (v0.83)</h2>
+            <h2>Frontura Early Access Booking (v0.84)</h2>
             <p>Who's who, when.</p>
         </div>
 
@@ -619,6 +619,10 @@
                                 <option value="exclusive">Exclusive Booking (just me/my group)</option>
                                 <option value="host-available">Host Available (others can join)</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes (optional):</label>
+                            <textarea id="notes" rows="3" placeholder="Any special requests or notes..."></textarea>
                         </div>
                         <div class="form-buttons">
                             <button type="submit" class="btn btn-primary">Book Now</button>
@@ -897,27 +901,28 @@
         }
                 
 
-        // Render calendar
+    // Render calendar
         function renderCalendar() {
             console.log('Rendering calendar for:', currentDate);
             
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             
+            // --- START OF FIX ---
+            const today = new Date(); // Get today's date to compare against
+            // --- END OF FIX ---
+            
             console.log('Year:', year, 'Month:', month, 'Month name:', new Date(year, month).toLocaleDateString('en-US', { month: 'long' }));
             
-            // Update month title
             document.getElementById('current-month').textContent = 
                 new Date(year, month).toLocaleDateString('en-US', { 
                     month: 'long', 
                     year: 'numeric' 
                 });
 
-            // Clear calendar grid
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
 
-            // Add day headers (starting with Monday)
             const dayHeaders = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             dayHeaders.forEach(day => {
                 const dayHeader = document.createElement('div');
@@ -926,42 +931,41 @@
                 grid.appendChild(dayHeader);
             });
 
-            // Get first day of month and adjust for Monday start
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
             const daysInMonth = lastDay.getDate();
             
             console.log('First day of month:', firstDay, 'Days in month:', daysInMonth);
             
-            // Adjust starting day of week (0=Sunday, 1=Monday, etc.) to Monday start
             let startingDayOfWeek = firstDay.getDay();
-            startingDayOfWeek = startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1; // Convert Sunday (0) to 6, others shift down by 1
+            startingDayOfWeek = startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1;
             
             console.log('Starting day of week (0=Monday):', startingDayOfWeek);
 
-            // Add empty cells for days before the first day of the month
             for (let i = 0; i < startingDayOfWeek; i++) {
                 const emptyDay = document.createElement('div');
                 emptyDay.className = 'calendar-day other-month';
                 grid.appendChild(emptyDay);
             }
 
-            // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
-                
                 const dayElement = document.createElement('div');
                 dayElement.className = 'calendar-day';
+                
+                // Check if the current day being rendered is today
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayElement.classList.add('today');
+                }
+
                 const dayNumber = document.createElement('div');
                 dayNumber.className = 'day-number';
                 dayNumber.textContent = day;
                 dayElement.appendChild(dayNumber);
 
-                // Check if day is booked
                 const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const booking = findBookingForDate(dateString);
                 
                 if (booking) {
-                    // Add appropriate class based on booking type
                     if (booking.bookingType === 'host-available') {
                         dayElement.classList.add('host-available');
                     } else {
@@ -971,7 +975,6 @@
                     const bookingInfo = document.createElement('div');
                     bookingInfo.className = 'booking-info';
                     
-                    // Show different text based on booking type
                     if (booking.bookingType === 'host-available') {
                         bookingInfo.textContent = `${booking.guestName} + others welcome`;
                     } else {
@@ -981,9 +984,7 @@
                     dayElement.appendChild(bookingInfo);
                 }
 
-                // Add click handler
                 dayElement.addEventListener('click', () => {
-                    // Only allow booking if user is authenticated
                     if (!currentUser) {
                         console.log('User not authenticated, cannot book');
                         return;
